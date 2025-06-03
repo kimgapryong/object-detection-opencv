@@ -1,110 +1,48 @@
-#############################################
-# Object detection - YOLO - OpenCV
-# Author : Arun Ponnusamy   (July 16, 2018)
-# Website : http://www.arunponnusamy.com
-############################################
-
-
-import cv2
 import argparse
+from ultralytics import YOLO
+import cv2
 import numpy as np
 
-ap = argparse.ArgumentParser()
-ap.add_argument('-i', '--image', required=True,
-                help = 'path to input image')
-ap.add_argument('-c', '--config', required=True,
-                help = 'path to yolo config file')
-ap.add_argument('-w', '--weights', required=True,
-                help = 'path to yolo pre-trained weights')
-ap.add_argument('-cl', '--classes', required=True,
-                help = 'path to text file containing class names')
-args = ap.parse_args()
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-i', '--image', required=True, help='Path to input image')
+parser.add_argument('-m', '--model', default='best.pt', help='YOLOv8 classification model to use')
+args = parser.parse_args()
 
 
-def get_output_layers(net):
-    
-    layer_names = net.getLayerNames()
-    try:
-        output_layers = [layer_names[i - 1] for i in net.getUnconnectedOutLayers()]
-    except:
-        output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+model = YOLO(args.model)
 
-    return output_layers
+img = cv2.imread(args.image)
+
+if img is None:
+    raise FileNotFoundError(f"이미지를 찾을 수 없음: {args.image}")
 
 
-def draw_prediction(img, class_id, confidence, x, y, x_plus_w, y_plus_h):
-
-    label = str(classes[class_id])
-
-    color = COLORS[class_id]
-
-    cv2.rectangle(img, (x,y), (x_plus_w,y_plus_h), color, 2)
-
-    cv2.putText(img, label, (x-10,y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-
-    
-image = cv2.imread(args.image)
-
-Width = image.shape[1]
-Height = image.shape[0]
-scale = 0.00392
-
-classes = None
-
-with open(args.classes, 'r') as f:
-    classes = [line.strip() for line in f.readlines()]
-
-COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
-
-net = cv2.dnn.readNet(args.weights, args.config)
-
-blob = cv2.dnn.blobFromImage(image, scale, (416,416), (0,0,0), True, crop=False)
-
-net.setInput(blob)
-
-outs = net.forward(get_output_layers(net))
-
-class_ids = []
-confidences = []
-boxes = []
-conf_threshold = 0.5
-nms_threshold = 0.4
+if len(img.shape) == 2 or img.shape[2] == 1:
+    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
 
-for out in outs:
-    for detection in out:
-        scores = detection[5:]
-        class_id = np.argmax(scores)
-        confidence = scores[class_id]
-        if confidence > 0.5:
-            center_x = int(detection[0] * Width)
-            center_y = int(detection[1] * Height)
-            w = int(detection[2] * Width)
-            h = int(detection[3] * Height)
-            x = center_x - w / 2
-            y = center_y - h / 2
-            class_ids.append(class_id)
-            confidences.append(float(confidence))
-            boxes.append([x, y, w, h])
+results = model(args.image)
 
 
-indices = cv2.dnn.NMSBoxes(boxes, confidences, conf_threshold, nms_threshold)
+probs = results[0].probs.data
+top3_idx = np.argsort(probs)[::-1][:3]
+top3 = [(model.names[i], probs[i]) for i in top3_idx]
 
-for i in indices:
-    try:
-        box = boxes[i]
-    except:
-        i = i[0]
-        box = boxes[i]
-    
-    x = box[0]
-    y = box[1]
-    w = box[2]
-    h = box[3]
-    draw_prediction(image, class_ids[i], confidences[i], round(x), round(y), round(x+w), round(y+h))
 
-cv2.imshow("object detection", image)
-cv2.waitKey()
-    
-cv2.imwrite("object-detection.jpg", image)
+for idx, (cls_name, prob) in enumerate(top3):
+    label = f"{idx+1}. {cls_name}: {prob:.2f}"
+    y = 40 + idx * 40
+    cv2.putText(img, label, (20, y), cv2.FONT_HERSHEY_SIMPLEX, 1.1, (0, 255, 0), 2)
+
+
+cv2.imshow("Character Classification (Top 3)", img)
+cv2.imwrite("character-classified.jpg", img)
+cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+print("✅ 예측 결과:")
+for rank, (name, p) in enumerate(top3, 1):
+    print(f"{rank}. {name} ({p:.2f})")
+
+print("✅ 결과 저장 완료: character-classified.jpg")
