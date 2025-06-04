@@ -208,7 +208,7 @@ print(" 결과 저장 완료: character-classified.jpg")
 # THANK YOU!
 
 <p align="center">
-  <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdDRrdjhkMTA5MGNsbjlmODJ1cmM5cXdqZmt1MGNzeHF3MHhhbmN3dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/XIqCQx02E1U9W/giphy.gif" width="400" />
+  <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWJtbzZzb2ZhejlqbTd4cXpzenQxd2diaXQwenA2enJ6Nm1uMHpxZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ao2IHZ0y6ZD2M/giphy.gif" width="400" />
 </p>
 
 **질문이 있으신가요?**  
