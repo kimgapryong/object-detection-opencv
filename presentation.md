@@ -208,7 +208,7 @@ print(" 결과 저장 완료: character-classified.jpg")
 # THANK YOU!
 
 <p align="center">
-  <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2F488429522103972903%2F&psig=AOvVaw0oivK5Sz8F6O9YzsbE4ulw&ust=1749085620108000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLiD16TK1o0DFQAAAAAdAAAAABAL" width="400" />
+  <img src="https://i.pinimg.com/originals/9b/e5/0c/9be50c5be0cda3b9e154fc9cfa3f21d1.gif" width="400" />
 </p>
 
 **질문이 있으신가요?**  
